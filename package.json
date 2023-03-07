@@ -1,0 +1,27 @@
+{
+  "name": "vidar",
+  "version": "1.0.0",
+  "description": "A simplistic method-based slash command handler for Discord.js.",
+  "main": "./src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --trace-warnings ./test/client.js"
+  },
+  "engines": {
+    "node": "16.x"
+  },
+  "keywords": [
+    "discord",
+    "djs",
+    "command",
+    "slash",
+    "handler",
+    "vidar",
+    "cannicide",
+    "discord.js"
+  ],
+  "author": "Cannicide",
+  "license": "MIT"
+}
