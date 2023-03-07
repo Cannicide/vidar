@@ -1,5 +1,5 @@
 {
-  "name": "vidar",
+  "name": "djs-vidar",
   "version": "1.0.0",
   "description": "A simplistic method-based slash command handler for Discord.js v14.",
   "main": "./src/index.js",
