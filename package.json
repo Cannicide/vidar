@@ -23,5 +23,11 @@
     "discord.js"
   ],
   "author": "Cannicide",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.7.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.35.0"
+  }
 }
