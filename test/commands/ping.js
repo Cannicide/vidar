@@ -1,3 +1,4 @@
+// Basic command tests
 const { command } = require("../../src/index");
 
 command("ping", "Ping.")
@@ -7,7 +8,7 @@ command("ping", "Ping.")
 
 command("pong", "Reunping.")
 .argument({
-    name: "[color]",
+    syntax: "[color]",
     description: "What is your favorite color?"
 })
 .action(i => {
