@@ -5,13 +5,14 @@ const client = new Client({
     intents: Vidar.allIntents()
 });
 
-// eslint-disable-next-line no-undef
-Vidar.initialize(client, __dirname + "/commands", ["668485643487412234"]);
+Vidar.initialize({
+    client,
+    commandPath: Vidar.dirname + "/commands",
+    debugGuilds: ["668485643487412234"]
+});
 
 client.once("ready", () => {
     console.log("READY");
 });
 
-// @ts-ignore due to accessing private method
-// eslint-disable-next-line no-undef
-client.login(Vidar.loadToken(__dirname + "/token.json"));
+client.login(Vidar.loadToken(Vidar.dirname + "/token.json"));
