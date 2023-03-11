@@ -70,9 +70,9 @@ class VidarCommand {
      * Allows pre-defining a subcommand and setting its description.
      * Arguments that reference nonexistent subcommands will automatically create new subcommands using this method.
      * @param {Object} arg
-     * @param {String} name - The name of the subcommand to add to the command.
-     * @param {String} description - The required description of the subcommand.
-     * @param {String} [subgroup] - The optional subgroup this subcommand belongs to.
+     * @param {String} arg.name - The name of the subcommand to add to the command.
+     * @param {String} arg.description - The required description of the subcommand.
+     * @param {String} [arg.subgroup] - The optional subgroup this subcommand belongs to.
      * @returns 
      */
     subcommand({ name, description, subgroup }) {
@@ -116,8 +116,8 @@ class VidarCommand {
      * Allows pre-defining a subgroup and setting its description.
      * Arguments that reference nonexistent subgroups will automatically create new subgroups using this method.
      * @param {Object} arg
-     * @param {String} name - The name of the subgroup to add to the command.
-     * @param {String} description - The required description of the subgroup.
+     * @param {String} arg.name - The name of the subgroup to add to the command.
+     * @param {String} arg.description - The required description of the subgroup.
      * @returns 
      */
     subgroup({ name, description }) {
