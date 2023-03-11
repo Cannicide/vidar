@@ -14,6 +14,10 @@ class VidarHandler {
     static #debug;
     static #testGuilds = [];
 
+    static size() {
+        return this.#cache.size;
+    }
+
     /**
      * 
      * @param {import("discord.js").Client} client 

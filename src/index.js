@@ -20,12 +20,13 @@ module.exports = class Vidar {
      * @param {String[]} [opts.debugGuilds] - An optional array of guild IDs to test all of your commands ins. For use during development only, do not use this while in production. Enables some debug messages.
      */
     static initialize({ client, commandPath, debugGuilds = undefined }) {
-        if (!commandPath) throw new Error("VidarError: You did not specify the path to your command file or a folder containing command files.");
 
         client.once("ready", async () => {
             await this.loadFiles(commandPath);
             if (debugGuilds) VidarHandler.debugGuilds(debugGuilds);
             VidarHandler.initialize(client, debugGuilds);
+            await VidarHandler.initialized;
+            if (!commandPath && !VidarHandler.size) console.warn("VidarWarn: No commands were loaded. This may be because you did not provide initialize() with the path to your command file or a folder containing command files.");
         });
     }
 
