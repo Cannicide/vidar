@@ -261,16 +261,16 @@ class VidarCommand {
      * });
      * 
      * @param {Object} arg
-     * @param {String} name - The name of the argument.
-     * @param {String} description - The required description of the argument.
-     * @param {String} [type] - The datatype of the argument. Defaults to string.
-     * @param {Boolean} [optional] - Whether the argument is optional. Defaults to false; arguments are required by default.
-     * @param {String} [subcommand] - The optional name of the subcommand this argument belongs or should belong to, if any.
-     * @param {String} [subgroup] - The optional name of the subgroup this argument and its subcommand belong or should belong to, if any.
-     * @param {(import("discord.js").ChatInputCommandInteraction)=>Array} [autoComplete] - An optional auto complete callback for this argument. Cannot be used with choices.
-     * @param {String[]} [choices] - An optional array of choices for users to choose from in this argument. Cannot be used with autoComplete.
-     * @param {Number} [max] - An optional maximum value for numeric arguments.
-     * @param {Number} [min] - An optional minimum value for numeric arguments.
+     * @param {String} arg.name - The name of the argument.
+     * @param {String} arg.description - The required description of the argument.
+     * @param {String} [arg.type] - The datatype of the argument. Defaults to string.
+     * @param {Boolean} [arg.optional] - Whether the argument is optional. Defaults to false; arguments are required by default.
+     * @param {String} [arg.subcommand] - The optional name of the subcommand this argument belongs or should belong to, if any.
+     * @param {String} [arg.subgroup] - The optional name of the subgroup this argument and its subcommand belong or should belong to, if any.
+     * @param {VidarAutoComplete} [arg.autoComplete] - An optional auto complete callback for this argument. Cannot be used with choices.
+     * @param {String[]} [arg.choices] - An optional array of choices for users to choose from in this argument. Cannot be used with autoComplete.
+     * @param {Number} [arg.max] - An optional maximum value for numeric arguments.
+     * @param {Number} [arg.min] - An optional minimum value for numeric arguments.
      * @returns 
      */
     rawArgument({ name, description, type = "string", optional = false, subcommand, subgroup, autoComplete, choices, max, min }) {
