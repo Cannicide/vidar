@@ -25,9 +25,10 @@
   "author": "Cannicide",
   "license": "MIT",
   "dependencies": {
+    "discord-api-types": "^0.37.35",
     "discord.js": "^14.7.1"
   },
   "devDependencies": {
-    "eslint": "^8.35.0"
+    "eslint": "^8.36.0"
   }
 }
