@@ -1,6 +1,6 @@
 const { ChannelType } = require("discord-api-types/v10");
 
-module.exports = class VidarArgTypes {
+class VidarArgTypes {
 
     static Channels = {
         All: "allchannel",
@@ -105,4 +105,25 @@ module.exports = class VidarArgTypes {
         return Object.keys(this.Channels).some(k => this.Channels[k] == key);
     }
 
+    static choiceTypes() {
+        return [ this.String, this.Float, this.Int ];
+    }
+
+}
+
+class VidarSubTypes {
+    static Subcommand = "subcommand";
+    static Subgroup = "subgroup";
+    static Hybrid = "both";
+
+    static typeOf(subgroup, subcommand) {
+        if (subgroup && subcommand) return this.Hybrid;
+        if (subcommand) return this.Subcommand;
+        if (subgroup) return this.Subgroup;
+    }
+}
+
+module.exports = {
+    ArgTypes: VidarArgTypes,
+    SubTypes: VidarSubTypes
 }

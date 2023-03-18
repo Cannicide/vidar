@@ -1,5 +1,6 @@
 const VidarCommand = require("./command");
 const VidarHandler = require("./handler");
+const ErrorChecks = require("./errors");
 
 module.exports = class Vidar {
 
@@ -64,6 +65,8 @@ module.exports = class Vidar {
     static async loadFiles(dir) {
         dir = dir.replace("C:", "").replace(/\\/g, "/");
 
+        ErrorChecks.pred(() => !require("fs").existsSync(dir), `Invalid path to command file/directory '${dir}' provided.\nBe sure to use an absolute path, such as 'Vidar.dirname() + "/commands"'`);
+
         if (!require("fs").lstatSync(dir).isDirectory()) return this.loadFile(dir);
         let files = require("fs").readdirSync(dir);
 
@@ -94,11 +97,15 @@ module.exports = class Vidar {
      * This utility was derived from the latest version of the Sifbase module.
      * 
      * @example
-     * const dir = Vidar.dirname;
+     * // Path to current folder
+     * const dir = Vidar.dirname();
+     * 
+     * // Path to a JSON file in the same folder
+     * const path = Vidar.dirname() + "/other.json";
      * 
      * @returns {String} Directory filepath.
      */
-    static get dirname() {
+    static dirname() {
         // eslint-disable-next-line no-undef
         const platform = process.platform;
         const rawPath = new Error().stack.split("\n")[2].trim().split("(").slice(1).join("(").split(":").slice(0, -2).join(":").replace(/\\/g, "/").split("/").slice(0, -1).join("/");
@@ -111,4 +118,34 @@ module.exports = class Vidar {
         return decodeURIComponent(encodedPath);
     }
 
+    static _default = "$vidardefault";
+
+    /**
+     * A unique value representing a default value in Vidar methods.
+     * @returns {String}
+     */
+    static get def() {
+        return this._default;
+    }
+
+    /**
+     * Utility to construct an object mapping all argument names to their values, given a chat input interaction.
+     * Simplifies retrieving argument values in command actions/handlers.
+     * @param {import("discord.js").ChatInputCommandInteraction} interaction 
+     */
+    static args(interaction) {
+        const args = {};
+        const { ApplicationCommandOptionType } = require("discord-api-types/v10");
+
+        function handle(data) {
+            for (const layer of data) {
+                if (layer.type == ApplicationCommandOptionType.SubcommandGroup && interaction.options.getSubcommandGroup(false) == layer.name) return handle(layer.options);
+                if (layer.type == ApplicationCommandOptionType.Subcommand && interaction.options.getSubcommand(false) == layer.name) return handle(layer.options);
+                if (interaction.options.get(layer.name, false)) args[layer.name] = layer.value;
+            }
+        }
+
+        handle(interaction.options.data);
+        return args;
+    }
 }

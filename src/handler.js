@@ -1,4 +1,5 @@
 const { Collection } = require("discord.js");
+const ErrorChecks = require("./errors");
 
 class VidarHandler {
     
@@ -52,7 +53,6 @@ class VidarHandler {
      */
     static async setCommand(commandName, command) {
         this.#cache.set(commandName, command);
-        console.log("ADDED TO CACHE:", commandName);
         if (await this.initialized) this.postInitializeCommand(command);
     }
 
@@ -73,16 +73,16 @@ class VidarHandler {
             let autoCompleteMap = this.getCommand(interaction.commandName)?.data.autoComplete;
             if (!autoCompleteMap) return;
 
-            const argName = interaction.options.getFocused(true).name;
-            let sub = interaction.options.getSubcommand(false);
-            let autoComplete;
+            const arg = interaction.options.getFocused(true).name;
+            let subcommand = interaction.options.getSubcommand(false);
+            let subgroup = interaction.options.getSubcommandGroup(false);
 
-            if (sub) autoComplete = autoCompleteMap.get(sub).get(argName);
-            else autoComplete = autoCompleteMap.get(argName);
+            const argName = ((subgroup ?? "") + " " + (subcommand ?? "") + " " + arg).trim();
+            let autoComplete = autoCompleteMap.get(argName);
 
             if (autoComplete) {
                 let result = await autoComplete(interaction);
-                if (!Array.isArray(result)) throw new Error("VidarError: Invalid result returned by autoComplete callback. Return type should be an Array of values.");
+                ErrorChecks.badtype(result, "array", "autoComplete callback return result");
 
                 if (!result) interaction.respond([]);
                 else interaction.respond(result.map(key => ({ name: key, value: key })));
@@ -96,17 +96,33 @@ class VidarHandler {
         const [ applicationCommands, guildCommands ] = this.#cache.partition(c => !c.data.guilds.size);
 
         // Set application commands:
-        if (applicationCommands.size) await this.client.application?.commands?.set(applicationCommands.map(c => c?.data.JSON).map(j => {
-            this.debug("ADDED GLOBAL COMMAND:", j.name);
-            return j;
-        }));
+        if (applicationCommands.size) {
+            try {
+                await this.client.application?.commands?.set(applicationCommands.map(c => c?.data.JSON).map(j => {
+                    this.debug("PUBLISHED GLOBAL COMMAND:", j.name);
+                    return j;
+                }));
+            }
+            catch (err) {
+                this.debug(`FAILED TO PUBLISH GUILD COMMANDS`);
+                ErrorChecks.pred(() => true, `VidarError: Issue publishing guild commands.\nError Message: ${err.message}`);
+            }
+        }  
 
         // Set guild commands:
         const guilds = guildCommands.map(c => [...c.data.guilds.values()]).flat();
-        for (const guild of this.getGuilds(guilds).values()) await guild?.commands?.set(guildCommands.filter(c => c.data.guilds.has(guild.id)).map(c => c?.data.JSON).map(j => {
-            this.debug(`ADDED GUILD <${guild.id}> COMMAND:`, j.name);
-            return j;
-        }));
+        for (const guild of this.getGuilds(guilds).values()) {
+            try {
+                await guild?.commands?.set(guildCommands.filter(c => c.data.guilds.has(guild.id)).map(c => c?.data.JSON).map(j => {
+                    this.debug(`PUBLISHED GUILD <${guild.id}> COMMAND:`, j.name);
+                    return j;
+                }));
+            }
+            catch (err) {
+                this.debug(`FAILED TO PUBLISH GLOBAL COMMANDS`);
+                ErrorChecks.pred(() => true, `VidarError: Issue publishing guild commands.\nError Message: ${err.message}`);
+            }
+        }
 
         // Setup command listener:
         this.client.on("interactionCreate", async interaction => {
@@ -117,17 +133,27 @@ class VidarHandler {
 
             const channels = [...command.channels.values()];
             const perms = [...command.requires.perms.values()];
-            const roles = command.requires.roles;
+            const roles = [...command.requires.roles.values()];
             const action = command.action;
 
             if (channels.length && !channels.some(c => c && (c == interaction.channel?.name || c == interaction.channel?.id)))
-                return interaction.reply({ content: "> **You cannot use this command in this channel.**", ephemeral: true });
+                return interaction.reply({ content: "> 🚷 **You cannot use this command in this channel.**", ephemeral: true });
             if (!perms.every(p => interaction.member?.permissions.has(p)))
-                return interaction.reply({ content: "> **You do not have the necessary perms to use this command.**", ephemeral: true });
-            if (roles.size && !interaction.member?.roles.cache.hasAll(...roles.values()))
-                return interaction.reply({ content: "> **You do not have the necessary roles to use this command.**", ephemeral: true });
+                return interaction.reply({ content: "> ⛔ **You do not have the necessary perms to use this command.**", ephemeral: true });
+            if (!roles.every(r => interaction.member?.roles.cache.some(role => r == role.name || r == role.id)))
+                return interaction.reply({ content: "> ⛔ **You do not have the necessary roles to use this command.**", ephemeral: true });
 
-            action(interaction);
+            try {
+                await action(interaction);
+            }
+            catch (err) {
+                setTimeout(() => {
+                    if (interaction.deferred) interaction.editReply({ content: "> ⚠️ **Sorry, an error occurred while running this command.**", ephemeral: true });
+                    else if (!interaction.replied) interaction.reply({ content: "> ⚠️ **Sorry, an error occurred while running this command.**", ephemeral: true });
+
+                    setTimeout(() => ErrorChecks.pred(() => true, `Error occurred while executing command '${interaction.commandName}':\n\t${err.message}`), 100);
+                }, 1000);
+            }
         });
 
         return true;
@@ -155,18 +181,29 @@ class VidarHandler {
             // Add guild command:
 
             for (const guild of this.getGuilds([...data.guilds.values()]).values()) {
-                const output = await guild?.commands?.create(data.JSON);
-                if (!output) return;
-                this.debug(`POST ADDED GUILD <${guild.id}> COMMAND:`, data.JSON.name)
-                // TODO: add error catching on command creation
+                try {
+                    const output = await guild?.commands?.create(data.JSON);
+                    if (!output) return;
+                    this.debug(`POST-PUBLISHED GUILD <${guild.id}> COMMAND:`, data.JSON.name);
+                }
+                catch (err) {
+                    this.debug(`FAILED TO POST-PUBLISH GUILD <${guild.id}> COMMAND:`, data.JSON.name);
+                    ErrorChecks.pred(() => true, `VidarError: Issue post-publishing guild command.\nError Message: ${err.message}`);
+                }
             }
         }
         else {
             // Add application command:
             
-            const output = await this.client.application?.commands?.create(data.JSON);
-            if (!output) return;
-            this.debug("POST ADDED GLOBAL COMMAND:", data.JSON.name)
+            try {
+                const output = await this.client.application?.commands?.create(data.JSON);
+                if (!output) return;
+                this.debug("POST-PUBLISHED GLOBAL COMMAND:", data.JSON.name);
+            }
+            catch (err) {
+                this.debug(`FAILED TO POST-PUBLISH GLOBAL COMMAND:`, data.JSON.name);
+                ErrorChecks.pred(() => true, `VidarError: Issue post-publishing global command.\nError Message: ${err.message}`);
+            }
         }
     }
 }
