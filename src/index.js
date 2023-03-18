@@ -58,9 +58,8 @@ module.exports = class Vidar {
     }
 
     /**
-     * Loads a file, or recursively loads all files and subfolders within a folder.
+     * Utility to load a file, or recursively load all files and subfolders within a folder.
      * Used internally by initialize() to load command files.
-     * @private
      */
     static async loadFiles(dir) {
         dir = dir.replace("C:", "").replace(/\\/g, "/");
@@ -118,14 +117,12 @@ module.exports = class Vidar {
         return decodeURIComponent(encodedPath);
     }
 
-    static _default = "$vidardefault";
-
     /**
      * A unique value representing a default value in Vidar methods.
      * @returns {String}
      */
     static get def() {
-        return this._default;
+        return "$vidardefault";
     }
 
     /**

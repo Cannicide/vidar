@@ -502,6 +502,16 @@ class VidarCommand {
     }
 
     /**
+     * Makes this command NSFW-only.
+     * NSFW-only commands can only be used in NSFW channels.
+     * @returns 
+     */
+    nsfw() {
+        this.builder.setNSFW(true);
+        return this;
+    }
+
+    /**
      * Defines argument/subcommand descriptions, with support for localizations in various languages.
      * Used internally by docs().
      * 
