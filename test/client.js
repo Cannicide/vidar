@@ -7,7 +7,7 @@ const client = new Client({
 
 Vidar.initialize({
     client,
-    commandPath: Vidar.dirname + "/commands",
+    commandPath: Vidar.dirname() + "/commands",
     debugGuilds: ["668485643487412234"]
 });
 
@@ -15,4 +15,4 @@ client.once("ready", () => {
     console.log("READY");
 });
 
-client.login(Vidar.loadToken(Vidar.dirname + "/token.json"));
+client.login(Vidar.loadToken(Vidar.dirname() + "/token.json"));

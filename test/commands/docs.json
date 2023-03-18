@@ -1,0 +1,27 @@
+{
+    "minmax": {
+        "value": "The string value to input.",
+        "[multiplier]": {
+            "$vidardefault": "The multiplier.",
+            "en-GB": "The multiplier, chap."
+        }
+    },
+    "pong": {
+        "<color>": "The color to pong back."
+    },
+    "subg": {
+        "group add": "Adds a group.",
+        "group add <name>": "Name of group to add.",
+        "group add description": "Description of group to add.",
+
+        "group get": "Gets a group.",
+        "group get <name>": "Name of group to get.",
+
+        "user add": "Adds a user.",
+        "user add <user>": "User to add.",
+        "user add [data]": "Data of user to add.",
+
+        "user get": "Gets a user.",
+        "user get <user>": "User to get."
+    }
+}

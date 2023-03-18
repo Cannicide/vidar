@@ -3,24 +3,15 @@ const { command } = require("../../src/index");
 let color = null;
 
 command("subc", "Subcommand test")
-.subcommand({
-    name: "set",
-    description: "Set a color."
-})
-.argument({
-    syntax: "set <color>",
-    description: "The color to set."
-})
-.subcommand({
-    name: "get",
-    description: "Get a color."
-})
-.action(i => {
-    if (i.options.getSubcommand() == "set") {
+.argument("set <color> [msg]")
+.argument("get")
+.action({
+    "set": i => {
         color = i.options.getString("color");
-        i.reply("Set color to " + color + "!");
-    }
-    else {
+        const msg = i.options.getString("msg", false);
+        i.reply("Set color to " + color + "! " + (msg ?? ""));
+    },
+    "get": i => {
         if (color) i.reply("Color is " + color + "!");
         else i.reply("Set the color first!");
     }

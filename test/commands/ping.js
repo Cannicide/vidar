@@ -1,5 +1,5 @@
 // Basic command tests
-const { command } = require("../../src/index");
+const { command, dirname } = require("../../src/index");
 
 command("ping", "Ping.")
 .action(i => {
@@ -7,13 +7,9 @@ command("ping", "Ping.")
 });
 
 command("pong", "Reunping.")
-.argument({
-    syntax: "[color]",
-    description: "What is your favorite color?"
-})
+.docs(dirname() + "/docs.json")
+.argument("[color: red | orange | yellow | green | blue | purple]")
 .action(i => {
     if (i.options.getString("color")) i.reply(i.options.getString("color") + " is a great color! Ping.");
     else i.reply("Poooooong. Why no color?");
 });
-
-// TODO: add more tests in other files
