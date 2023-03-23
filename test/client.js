@@ -15,4 +15,4 @@ client.once("ready", () => {
     console.log("READY");
 });
 
-client.login(Vidar.loadToken(Vidar.dirname() + "/token.json"));
+Vidar.loadToken(client, Vidar.dirname() + "/token.json");

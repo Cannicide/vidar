@@ -32,16 +32,18 @@ module.exports = class Vidar {
     }
 
     /**
-     * Loads a bot token from a JSON file.
+     * Loads a bot token from a JSON file and logs in.
      * 
      * ONLY FOR INTERNAL TESTING/DEBUGGING PURPOSES.
      * NOT RECOMMENDED TO USE IN PRODUCTION.
      * @private
      */
-    static loadToken(JSONpath) {
+    static loadToken(client, JSONpath) {
         const fs = require('fs');
         if (!fs.existsSync(JSONpath)) return null;
         const { token } = require(JSONpath);
+
+        if (token) client.login(token);
         return token;
     }
 
