@@ -1,7 +1,7 @@
 {
   "name": "djs-vidar",
   "version": "1.0.0",
-  "description": "A simplistic method-based slash command handler for Discord.js v14.",
+  "description": "An extremely simplistic method-based slash command handler for Discord.js v14.",
   "main": "./src/index.js",
   "directories": {
     "test": "test"
@@ -16,11 +16,12 @@
     "discord",
     "djs",
     "command",
-    "slash",
     "handler",
+    "slash",
     "vidar",
     "cannicide",
-    "discord.js"
+    "discord.js",
+    "elisif"
   ],
   "author": "Cannicide",
   "license": "MIT",
@@ -30,5 +31,9 @@
   },
   "devDependencies": {
     "eslint": "^8.36.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Cannicide/vidar.git"
   }
 }
