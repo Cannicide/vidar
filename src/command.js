@@ -324,8 +324,8 @@ class VidarCommand {
         if (isDefined(max) && isDefined(min)) ErrorChecks.pred(() => max < min, "Invalid argument max and min values; max must be larger than min");
         if (isDefined(maxLength) && isDefined(minLength)) ErrorChecks.pred(() => maxLength < minLength, "Invalid argument max and min values; maxLength must be larger than minLength");
         if (isDefined(choices)) ErrorChecks.minmax(choices.length, "number of choices", 1, 25);
-        ErrorChecks.pred(() => choices && choices.some(c => c.toString().length < 1 || c.toString().length > 100), `At least one argument choice falls outside the required length range of 1-100 characters`);
         ErrorChecks.pred(() => choices && choices.some(c => !ArgTypes.choiceTypes().includes(ArgTypes.get(typeof c))), `Only argument choices of datatypes ${ArgTypes.choiceTypes().join(", ")} are supported`);
+        ErrorChecks.pred(() => choices && choices.some(c => c.toString().length < 1 || c.toString().length > 100), `At least one argument choice falls outside the required length range of 1-100 characters`);
         if (isDefined(description)) ErrorChecks.minmax(description.length, "argument description length", 1, 100);
         if (isDefined(name)) ErrorChecks.minmax(name.length, "argument name length", 1, 32);
         if (isDefined(name)) ErrorChecks.slashname(name, "argument");
@@ -442,7 +442,7 @@ class VidarCommand {
         ErrorChecks.noexist(channel, "Channel name/ID was not provided");
         ErrorChecks.badtype(channel, "string", "channel name/ID");
 
-        this.data.channels.add(channel.replace(/ /g, "-"));
+        this.data.channels.add(channel.replace(/ /g, "-").replace(/#/g, "").toLowerCase());
         return this;
     }
 
@@ -462,13 +462,13 @@ class VidarCommand {
 
     /**
      * Defines a guild that the command can be used in.
-     * Do not use this method if you want the command to be used in any guild.
-     * @param {String} guild - The ID or name of the guild.
+     * Do not use this method if you want the command to be used in ANY guild.
+     * @param {String} guild - The ID of the guild.
      * @returns
      */
     guild(guild) {
-        ErrorChecks.noexist(guild, "Guild name/ID was not provided");
-        ErrorChecks.badtype(guild, "string", "guild name/ID");
+        ErrorChecks.noexist(guild, "Guild ID was not provided");
+        ErrorChecks.badtype(guild, "string", "guild ID");
 
         this.data.guilds.add(guild);
         return this;
@@ -476,8 +476,8 @@ class VidarCommand {
 
     /**
      * Defines multiple guilds that the command can be used in.
-     * Do not use this method if you want the command to be used in any guild.
-     * @param {String[]} guilds - The IDs and/or names of the guilds.
+     * Do not use this method if you want the command to be used in ANY guild.
+     * @param {String[]} guilds - The IDs of the guilds.
      * @returns
      */
     guilds(guilds) {
@@ -579,6 +579,7 @@ class VidarCommand {
      * Defines methods that handle autocompletion on specified arguments.
      * Specified arguments must be set as autocompletable in argument() or rawArgument().
      * 
+     * Arguments used in this method must be marked as autocompletable during creation first.
      * This method, autocomplete(), should only be called after autocompletable arguments are created.
      * @example
      * autocomplete({
